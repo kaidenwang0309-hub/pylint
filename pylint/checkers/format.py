@@ -363,6 +363,13 @@ class FormatChecker(BaseTokenChecker, BaseRawFileChecker):
                         # For walrus operators in `if (not)` conditions and comprehensions
                         if keyword_token in {"in", "if", "not"}:
                             continue
+                        elif keyword_token is "for":
+                            # Check that it's not a tuple, since tuples are always okay
+                            # (see issue #5334)
+                            if len([x for x in tokens if x.string == ","]) == 0:
+                                self.add_message(
+                                    "superfluous-parens", line=line-num, args=keyword_token
+                                )
                         return
                     contains_double_parens -= 1
                     continue
